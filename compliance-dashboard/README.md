@@ -277,3 +277,21 @@ This architecture is designed to be "Evolutionary," allowing easy integration of
 <div align="center">
   <sub>Built with ❤️ for the Modular Compliance Project</sub>
 </div>
+
+---
+
+# PR Summary
+<!-- Briefly describe what this PR does. E.g., Add Task Overview module -->
+
+# Changes
+- <!-- List key changes introduced in this PR -->
+
+# Testing
+- <!-- Steps to test this PR -->
+1. Pull the branch
+2. Run the app
+3. Verify main functionality
+
+# Notes
+- <!-- Any additional notes for reviewers -->
+
