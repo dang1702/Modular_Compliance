@@ -1,6 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { App, useTaskStore } from './app';
-import { act } from 'react-dom/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import React from 'react';
 

@@ -1,12 +1,9 @@
 import { create } from 'zustand';
+import React from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@compliance-dashboard/ui';
 
 /**
- * Represents a single compliance task within the system.
- * @property {string} id - Unique identifier for the task.
- * @property {string} title - Descriptive title of the task.
- * @property {string} dueDate - Due date in YYYY-MM-DD format.
- * @property {string} assignedTo - Name of the person responsible.
- * @property {'Pending' | 'In Progress' | 'Completed' | 'Overdue'} status - Current workflow status.
+ * Represents a single compliance task entity.
  */
 interface Task {
   id: string;
@@ -17,28 +14,21 @@ interface Task {
 }
 
 /**
- * Zustand store interface for managing task state.
+ * Zustand store definition for Task Overview Module.
+ * We use Zustand for state management because it's lightweight and perfect for
+ * isolated microfrontends, avoiding the boilerplate of Redux.
  */
 interface TaskStore {
-  /** List of all compliance tasks */
   tasks: Task[];
-  /** Current active filter for task list */
   filter: string;
-  /**
-   * Updates the current filter state.
-   * @param {string} filter - The status string to filter by (e.g., 'Pending', 'All').
-   */
   setFilter: (filter: string) => void;
-  /**
-   * Marks a specific task as completed.
-   * @param {string} id - The unique ID of the task to update.
-   */
   completeTask: (id: string) => void;
 }
 
 /**
- * Global state store for Task Overview module.
- * Uses Zustand for lightweight state management without prop drilling.
+ * Global Store Implementation
+ * This store is LOCAL to the Task Overview microfrontend.
+ * It does not leak state to the Shell or other remotes, ensuring isolation.
  */
 export const useTaskStore = create<TaskStore>((set) => ({
   tasks: [
@@ -50,31 +40,18 @@ export const useTaskStore = create<TaskStore>((set) => ({
   ],
   filter: 'All',
   setFilter: (filter) => set({ filter }),
+  // Optimistic update: Update UI immediately when task is completed
   completeTask: (id) => set((state) => ({
     tasks: state.tasks.map(t => t.id === id ? { ...t, status: 'Completed' } : t)
   }))
 }));
 
-import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@compliance-dashboard/ui';
-
-/**
- * Task Overview Module Entry Point.
- * Displays a filterable data table of compliance tasks.
- * Allows users to filter by status and mark tasks as complete.
- * 
- * @returns {JSX.Element} The rendered Task Overview component.
- */
 export function App() {
   const { tasks, filter, setFilter, completeTask } = useTaskStore();
 
+  // Client-side filtering logic
   const filteredTasks = tasks.filter(t => filter === 'All' || t.status === filter);
 
-  /**
-   * Helper function to determine the badge color based on task status.
-   * @param {string} status - The status of the task.
-   * @returns {string} Tailwind CSS class string.
-   */
   const getStatusColor = (status: string) => {
     switch(status) {
       case 'Completed': return 'bg-green-100 text-green-800';
@@ -88,11 +65,12 @@ export function App() {
     <Card className="h-full">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Task Overview</CardTitle>
+        {/* Filter Dropdown */}
         <select
           className="px-3 py-1 border rounded text-sm text-gray-600"
-          aria-label="Filter tasks by status"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
+          aria-label="Filter tasks by status"
         >
           <option value="All">All Statuses</option>
           <option value="Pending">Pending</option>
@@ -106,11 +84,11 @@ export function App() {
           <table className="w-full text-sm text-left">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50">
               <tr>
-                <th className="px-6 py-3" scope="col">Task Title</th>
-                <th className="px-6 py-3" scope="col">Due Date</th>
-                <th className="px-6 py-3" scope="col">Assigned To</th>
-                <th className="px-6 py-3" scope="col">Status</th>
-                <th className="px-6 py-3" scope="col">Actions</th>
+                <th className="px-6 py-3">Task Title</th>
+                <th className="px-6 py-3">Due Date</th>
+                <th className="px-6 py-3">Assigned To</th>
+                <th className="px-6 py-3">Status</th>
+                <th className="px-6 py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
