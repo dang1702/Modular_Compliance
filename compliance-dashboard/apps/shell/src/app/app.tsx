@@ -1,25 +1,34 @@
 import React, { Suspense } from 'react';
 import '@aws-amplify/ui-react/styles.css';
 
-// Lazy load remote microfrontends
+/**
+ * Lazy load remote microfrontends using React.lazy.
+ * This ensures that the remote bundles are only fetched when this component renders,
+ * optimizing initial load time (Code Splitting).
+ */
 const TaskOverview = React.lazy(() => import('taskOverview/App'));
 const ComplianceStatus = React.lazy(() => import('complianceStatus/App'));
 const RecentActivity = React.lazy(() => import('recentActivity/App'));
 
 /**
  * Main Shell Application Component.
- * Acts as the host container for all microfrontends.
- * Handles Authentication and Global Layout.
+ * Acts as the "Container" or "Host" for the entire Microfrontend architecture.
  * 
- * @returns {JSX.Element} The authenticated dashboard or login screen.
+ * Responsibilities:
+ * 1. Authentication (AWS Cognito via Amplify)
+ * 2. Global Layout (Sidebar, Header)
+ * 3. Orchestration of Remote Modules
  */
 export function App() {
-  // Mock authentication state for demonstration purposes
-  // In production, this would be handled by AWS Amplify's <Authenticator>
+  // Mock authentication state for demonstration purposes.
+  // In a real AWS Cognito setup, <Authenticator> handles this internal state automatically.
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 
   /* 
    * REAL IMPLEMENTATION WITH AWS AMPLIFY:
+   * 
+   * The <Authenticator> component automatically handles the entire login flow,
+   * including UI, state management, and token storage.
    * 
    * return (
    *   <Authenticator>
@@ -30,6 +39,7 @@ export function App() {
    * );
    */
 
+  // Mock Login Screen
   if (!isAuthenticated) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-100">
@@ -52,7 +62,7 @@ export function App() {
 
   return (
     <div className="flex h-screen bg-gray-50 text-slate-900 font-sans">
-      {/* Sidebar */}
+      {/* Sidebar Navigation */}
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-6 border-b border-gray-200">
           <h1 className="text-xl font-bold text-blue-600 flex items-center gap-2">
@@ -66,6 +76,7 @@ export function App() {
           <a href="#" className="flex items-center px-6 py-3 bg-blue-50 text-blue-700 border-r-2 border-blue-700">
             Dashboard
           </a>
+          {/* Placeholder links for future route expansion */}
           <a href="#" className="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50">
             Tasks
           </a>
@@ -89,7 +100,7 @@ export function App() {
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto p-8">
         <header className="flex justify-between items-center mb-8">
            <h2 className="text-2xl font-bold text-gray-800">Dashboard Overview</h2>
@@ -104,6 +115,12 @@ export function App() {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* 
+            Microfrontend Integration Zone:
+            Remote components are rendered here.
+            <Suspense> is used to show a loading state (skeleton) while the remote code is being fetched.
+          */}
+          
           {/* Main Column (Tasks & Activity) */}
           <div className="lg:col-span-2 space-y-6">
              <section>
